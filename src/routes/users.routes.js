@@ -7,4 +7,5 @@ const UserController = new UsersController()
 
 userRoutes.post("/", UserController.create) //direciona para criar o usuario
 
+userRoutes.put("/:id", UserController.update)
 module.exports = userRoutes
