@@ -27,7 +27,7 @@ class UserController {
   }
 
   async update(request, response) {
-    const { name, email, password, old_passoword } = request.body;
+    const { name, email, password, old_password } = request.body;
     const { id } = request.params;
 
     const database = await sqliteconection();
@@ -37,26 +37,26 @@ class UserController {
       throw new AppError("Usuario nao encontrado");
     }
 
-    const userWithUpadteEmail = await database.get(
+    const userWithUpdateEmail = await database.get(
       "SELECT * FROM users WHERE email = (?)",
-      email
+      [email]
     );
 
-    if (userWithUpadteEmail && userWithUpadteEmail.id !== user.id) {
+    if (userWithUpdateEmail && userWithUpdateEmail.id !== user.id) {
       throw new AppError("esse email já está em uso");
     }
 
     user.name = name ?? user.name;
     user.email = email ?? user.email;
 
-    if (password && !old_passoword) {
-      throw new AppError("voce deve informar a senha antiga para atualizar");
-    }
+    if (password) {
+      if (!old_password) {
+        throw new AppError("Você deve informar a senha antiga para atualizar.");
+      }
 
-    if (password && old_passoword) {
-      const checkOldPassword = await compare(old_passoword, user.password);
+      const checkOldPassword = await compare(old_password, user.password);
       if (!checkOldPassword) {
-        throw new AppError("A senha antiga nao confere");
+        throw new AppError("A senha antiga não confere.");
       }
 
       user.password = await hash(password, 8);
@@ -68,12 +68,13 @@ class UserController {
       name = ?, 
       email = ?, 
       password = ?,
-      update_at = DATETIME('now'),
-      WHERE id= ?`,
+      updated_at = DATETIME('now')
+      WHERE id= ?
+      `,
       [user.name, user.email, user.password, id]
     );
 
-    return response.json();
+    return response.json({ message: "Cadastro atualizado com sucesso!" });
   }
 }
 

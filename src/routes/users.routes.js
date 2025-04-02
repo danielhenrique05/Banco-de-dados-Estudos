@@ -3,9 +3,9 @@ const { Router } = require("express")// importa o Router
 const UsersController = require("../controllers/UsersController") // importa o user controller
 
 const userRoutes = Router()
-const UserController = new UsersController()
+const usersController = new UsersController()
 
-userRoutes.post("/", UserController.create) //direciona para criar o usuario
+userRoutes.post("/", usersController.create) //direciona para criar o usuario
+userRoutes.put("/:id", usersController.update)
 
-userRoutes.put("/:id", UserController.update)
 module.exports = userRoutes
